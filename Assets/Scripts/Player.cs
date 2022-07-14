@@ -7,6 +7,13 @@ public class Player : MonoBehaviour
     [SerializeField] // show variable on unity editor, but still private, and other game objects cant manipulate it
     private float _speed = 3.5f;
 
+    private float _laserPositionOffset = 0.8f;
+    
+    [SerializeField]
+    private float _fireCooldown = 0.2f;
+
+    private float _canFire = -1f;
+
     #region Walking Limits
 
     private float _maxUpPosition = 0;
@@ -15,6 +22,9 @@ public class Player : MonoBehaviour
     private float _maxLeftPosition = -11.3f; // negative side of axis
 
     #endregion
+
+    [SerializeField]
+    private GameObject _laserPrefab;
 
 
     // Start is called before the first frame update
@@ -28,6 +38,12 @@ public class Player : MonoBehaviour
     private void Update()
     {
         CalculateMovement();
+        
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
+        {
+            FireLaser();
+        }
+        
     }
 
     void CalculateMovement()
@@ -52,5 +68,11 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(_maxRightPosition, transform.position.y, 0);
         }
+    }
+
+    void FireLaser()
+    {
+        _canFire = Time.time + _fireCooldown;
+        Instantiate(_laserPrefab, new Vector3(transform.position.x, (transform.position.y + _laserPositionOffset), 0), Quaternion.identity);
     }
 }
