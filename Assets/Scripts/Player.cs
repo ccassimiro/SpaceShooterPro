@@ -25,6 +25,11 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _laserPrefab;
+    
+    [SerializeField]
+    private int _lives = 3;
+
+    private SpawnManager _spawnManager;
 
 
     // Start is called before the first frame update
@@ -32,6 +37,13 @@ public class Player : MonoBehaviour
     {
         // take the current position and set new position to (0, 0, 0)
         transform.position = new Vector3(0, 0, 0);
+        
+        // getting access to specific gameobject if we dont have reference to it
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        if (!_spawnManager)
+        {
+            Debug.LogError("Spawn Manager is null");
+        }
     }
 
     // Update is called once per frame
@@ -74,5 +86,16 @@ public class Player : MonoBehaviour
     {
         _canFire = Time.time + _fireCooldown;
         Instantiate(_laserPrefab, new Vector3(transform.position.x, (transform.position.y + _laserPositionOffset), 0), Quaternion.identity);
+    }
+
+    public void Damage()
+    {
+        _lives = _lives - 1;
+
+        if (_lives == 0)
+        {
+            _spawnManager.OnPlayerDeath();
+            Destroy(gameObject);
+        }
     }
 }
